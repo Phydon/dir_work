@@ -8,8 +8,11 @@ const F8: u8 = 83;
 const F9: u8 = 191;
 
 fn main() {
-    let tmp_dir_work = check_create_dir().unwrap();
-    get_dirs(&tmp_dir_work).unwrap();
+    if let Ok(tmp_dir_work) = check_create_dir() {
+        if let Err(err) = remove_tmps(&tmp_dir_work) {
+            eprintln!("Unable to remove tmp files: {err}");
+        }
+    }
 }
 
 fn check_create_dir() -> io::Result<String> {
@@ -28,7 +31,7 @@ fn check_create_dir() -> io::Result<String> {
     Ok(dir)
 }
 
-fn get_dirs(tmp_dir_work_path: &str) -> io::Result<()> {
+fn remove_tmps(tmp_dir_work_path: &str) -> io::Result<()> {
     // for entry in fs::read_dir(env::temp_dir().as_path())? {
     for entry in fs::read_dir(tmp_dir_work_path)? {
         let entry = entry?;
